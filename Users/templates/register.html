@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            font-family: Arial, sans-serif;
+        }
+
+        #fixed-header {
+            top: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            background-color: #007bff;
+            color: white;
+            padding: 50px 0;
+            z-index: 100;
+        }
+
+        #fixed-header h1 {
+            margin: 0;
+            font-size: 3rem;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            text-align: center;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 10px;
+        }
+
+        nav ul li a {
+            color: white;
+            font-size: 1.2rem;
+            text-decoration: none;
+        }
+
+        .reg-container {
+            max-width: 400px;
+            width: 100%;
+            margin: 80px auto;
+            padding: 40px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .reg-container h1 {
+            font-size: 26px;
+            color: #333;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        label {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        input[type="text"], input[type="password"], input[type="phone"], input[type="email"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .login-signup {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+        }
+
+        .login-signup a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .login-signup a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .reg-container {
+                padding: 30px;
+            }
+
+            #fixed-header h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header id="fixed-header">
+        <h1>Dental Management System</h1>
+        <nav>
+            <ul>
+                <li><a href="{% url 'dashboard' %}">Home</a></li>
+                <li><a href="{% url 'clinics' %}">Clinics</a></li>
+                <li><a href="{% url 'patients' %}">Patients</a></li>
+                <li><a href="{% url 'doctors' %}">Doctors</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="reg-container">
+        <h1>Registration</h1>
+        <form method="POST" action="{% url 'register' %}">
+            {% csrf_token %}
+            <label for="first_name">First Name*</label>
+            <input type="text" id="first_name" name="first_name" required value="{% if staff %}{{ staff.FIRST_NAME }}{% endif %}">
+            
+            <label for="last_name">Last Name*</label>
+            <input type="text" id="last_name" name="last_name" required value="{% if staff %}{{ staff.LAST_NAME }}{% endif %}">
+
+            <label for="phone">Phone</label>
+            <input type="phone" id="phone" name="phone" value="{% if staff %}{{ staff.PHONE }}{% endif %}">
+
+            <label for="email">Email*</label>
+            <input type="email" id="email" name="email" required value="{% if staff %}{{ staff.EMAIL }}{% endif %}">
+
+            <label for="password1">Password*</label>
+            <input type="password" id="password1" name="password1" required>
+
+            <label for="password2">Confirm Password*</label>
+            <input type="password" id="password2" name="password2" required>
+
+            <button type="submit">Register</button>
+        </form>
+
+        <div class="login-signup">
+            <span>Already have an account? <a href="{% url 'login' %}">Login</a></span>
+        </div>
+    </div>
+</body>
+</html>

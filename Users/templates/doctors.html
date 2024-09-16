@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctors</title>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var pageInput = document.getElementById('page-input');
+            pageInput.addEventListener('keydown', handleEnter);
+        });
+
+        function handleEnter(event) {
+            if (event.key === 'Enter') {
+                var pageInput = document.getElementById('page-input');
+                var selectedPage = pageInput.value;
+                var itemsPerPageSelect = document.getElementById('items_per_page_bottom');
+                var selectedItemsPerPage = itemsPerPageSelect ? itemsPerPageSelect.value : 10;
+
+                window.location.href = "?page=" + selectedPage + "&items_per_page=" + selectedItemsPerPage;
+                event.preventDefault();
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f6fa;
+        }
+
+        #fixed-header {
+            top: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            background-color: #007bff;
+            color: white;
+            position: sticky;
+            z-index: 100;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #fixed-header h1 {
+            margin: 0;
+            color: white;
+            font-size: 2.5rem;
+        }
+
+        header a {
+            color: white;
+            font-size: 1.2rem;
+            padding: 10px;
+            transition: background-color 0.3s;
+        }
+
+        header a:hover {
+            background-color: #0056b3;
+            border-radius: 5px;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 15px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2rem;
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .search-form {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .search-form input {
+            padding: 10px;
+            width: 300px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .search-form button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .search-form button:hover {
+            background-color: #0056b3;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 20px;
+            margin-left: 80px;
+        }
+
+        .add-btn {
+            background-color: #007bff;
+            color:white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+        }
+
+        table {
+            width: 90%;
+            margin: 0 auto;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .pagination {
+            text-align:left;
+            margin: 20px 0;
+            margin-left: 80px;
+        }
+
+        .pagination span {
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .pagination a {
+            margin: 0 5px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .pagination a:hover {
+            background-color: #0056b3;
+        }
+
+        .pagination select {
+            margin-left: 10px;
+        }
+
+        .login-button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .login-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <header id="fixed-header">
+        <h1>Dental Management System</h1>
+        <nav>
+            <ul>
+                <li><a href="{% url 'dashboard' %}">Home</a></li>
+                <li><a href="{% url 'clinics' %}">Clinics</a></li>
+                <li><a href="{% url 'patients' %}">Patients</a></li>
+            </ul>
+        </nav>
+        {% if user.is_authenticated %}
+            <a href="{% url 'logout' %}" class="login-button">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="login-button">Login</a>
+        {% endif %}
+    </header>
+
+    <h1>Doctors</h1>
+
+    <form class="search-form" method="post" action="{% url 'doctors' %}">
+        {% csrf_token %}
+        <input type="text" name="search" placeholder="Enter search term">
+        <button type="submit">Search</button>
+    </form>
+
+    <div class="button-container">
+        {% if user.is_authenticated %}
+            <a href="{% url 'add_doctor' %}" class="add-btn">Add Doctor</a>
+        {% endif %}
+    </div>
+
+    {% if user.is_authenticated %}
+        <form id="DoctorForm">
+            {% csrf_token %}
+            <input type="hidden" name="selected_doctor_ids" id="selectedDoctorIds" value="">
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" class="select-all-checkbox" id="selectAllCheckbox">
+                            <label for="selectAllCheckbox"></label>
+                        </th>
+                        <th>Doctor Name</th>
+                        <th>NPI</th>
+                        <th>Specialities</th>
+                        <th>Number of Affiliated Clinics</th>
+                        <th>Number of Affiliated Patients</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doctor in doctors %}
+                    <tr onclick="window.location.href='{% url 'view_doctor' doctor.doctor_id %}'" style="cursor: pointer;">
+                        <td><input type="checkbox" name="doctor_ids[]" value="{{ doctor.doctor_id}}"></td>
+                        <td>{{ doctor.name}}</td>
+                        <td>{{ doctor.npi}}</td>
+                        <td>{{ doctor.specialities}}</td>
+                        <td>{{ doctor.clinic}}</td>
+                        <td>{{ doctor.patient}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+
+        <div class="pagination">
+            <span class="step-links">
+                {% if doctors.has_previous %}
+                    <a href="?page=1">&laquo;</a>
+                    <a href="?page={{ doctors.previous_page_number }}">&#9666;</a>
+                {% endif %}
+
+                <span class="current">
+                    Page <input type="number" name="page" id="page-input" value="{{ doctors.number }}" min="1" max="{{ doctors.paginator.num_pages }}" onkeydown="handleEnter(event)"> of {{ doctors.paginator.num_pages }}.
+                </span>
+
+                {% if doctors.has_next %}
+                    <a href="?page={{ doctors.next_page_number }}">&#9656;</a>
+                    <a href="?page={{ doctors.paginator.num_pages }}">&raquo;</a>
+                {% endif %}
+            </span>
+
+            <form method="get" action="{% url 'doctors' %}" style="display: inline;">
+                <select id="items_per_page_bottom" name="items_per_page" onchange="this.form.submit()">
+                    <option value="10" {% if doctors.paginator.per_page == 10 %} selected {% endif %}>10</option>
+                    <option value="20" {% if doctors.paginator.per_page == 20 %} selected {% endif %}>20</option>
+                    <option value="50" {% if doctors.paginator.per_page == 50 %} selected {% endif %}>50</option>
+                </select>
+                <label for="items_per_page_bottom">Per page</label>
+            </form>
+        </div>
+    {% else %}
+        <h1>You need to be logged in to view Doctors</h1>
+    {% endif %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            var checkboxes = document.getElementsByName('doctor_ids[]');
+            var addDoctorBtn = document.querySelector('.add-btn');
+
+            selectAllCheckbox.addEventListener('change', function() {
+                checkboxes.forEach(function(checkbox) {
+                    checkbox.checked = selectAllCheckbox.checked;
+                });
+                updateButtonVisibility();
+            });
+
+            checkboxes.forEach(function(checkbox) {
+                checkbox.addEventListener('change', updateButtonVisibility);
+            });
+
+            function updateButtonVisibility() {
+                var selectedDoctorIds = Array.from(checkboxes)
+                    .filter(function(checkbox) {
+                        return checkbox.checked;
+                    })
+                    .map(function(checkbox) {
+                        return checkbox.value;
+                    });
+
+                document.getElementById('selectedDoctorIds').value = selectedDoctorIds.join(',');
+
+                selectAllCheckbox.checked = checkboxes.length > 0 && checkboxes.length === selectedDoctorIds.length;
+
+                addDoctorBtn.style.display = selectedDoctorIds.length > 0 ? 'none' : 'inline-block';
+            }
+        });
+    </script>
+
+</body>
+</html>
