@@ -32,14 +32,14 @@ urlpatterns = [
     path('patients/',patViews.patients, name = 'patients'),
     path('add_clinic/',cliViews.add_clinic, name = 'add_clinic'),
     path('edit_clinic/',cliViews.edit_clinic, name = 'edit_clinic'),
-    path('view_clinic/',cliViews.view_clinic, name = 'view_clinic'),
+    path('view_clinic/<int:clinic_id>',cliViews.view_clinic, name = 'view_clinic'),
     path('delete_clinic/',cliViews.delete_clinic, name = 'delete_clinic'),
     path('add_doctor/',docViews.add_doctor, name = 'add_doctor'),
     # path('edit_doctor/',docViews.edit_doctor, name = 'edit_doctor'),
     path('view_doctor/<int:doctor_id>',docViews.view_doctor, name = 'view_doctor'),
     path('add_patient/',patViews.add_patient, name = 'add_patient'),
     path('edit_patient/',patViews.edit_patient, name = 'edit_patient'),
-    path('view_patient/',patViews.view_patient, name = 'view_patient'),
+    path('view_patient/<int:patient_id>',patViews.view_patient, name = 'view_patient'),
     path('delete_patient/',patViews.delete_patient, name = 'delete_patient'),
     
     

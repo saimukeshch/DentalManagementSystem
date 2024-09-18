@@ -133,6 +133,11 @@
             text-decoration: none;
         }
 
+        .add-btn:hover {
+            background-color: #0056b3; 
+        }
+
+
         table {
             width: 90%;
             margin: 0 auto;
@@ -244,28 +249,27 @@
             <table>
                 <thead>
                     <tr>
-                        <th>
-                            <input type="checkbox" class="select-all-checkbox" id="selectAllCheckbox">
-                            <label for="selectAllCheckbox"></label>
-                        </th>
                         <th>Patient Name</th>
                         <th>Date of Birth</th>
-                        <th>SSN</th>
-                        <th>Gender</th>
-                        <th>Address</th>
-                        <th>Contact</th>
+                        <th>Last Visit Date</th>
+                        <th>Last Visit Doctor</th>
+                        <th>Last Visit Procedures</th>
+                        <th>Next Appointment Date</th>
+                        <th>Next Appointment Doctor</th>
+                        <th>Next Appointment Procedure</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for patient in patients %}
-                    <tr>
-                        <td><input type="checkbox" name="patient_ids[]" value="{{ patient.id }}"></td>
+                    <tr onclick="window.location.href='{% url 'view_patient' patient.patient_id %}'" style="cursor: pointer;">
                         <td>{{ patient.name }}</td>
                         <td>{{ patient.date_of_birth }}</td>
-                        <td>***-**-{{ patient.last_4_ssn }}</td>
-                        <td>{{ patient.gender }}</td>
-                        <td>{{ patient.address }}</td>
-                        <td>{{ patient.phone_number }}</td>
+                        <td>{{ patient.last_visit_date }}</td>
+                        <td>{{ patient.last_visit_doctor }}</td>
+                        <td>{{ patient.last_visit_procedures }}</td>
+                        <td>{{ patient.next_appointment_date }}</td>
+                        <td>{{ patient.next_appointment_doctor }}</td>
+                        <td>{{ patient.next_appointment_procedure }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -291,9 +295,9 @@
 
             <form method="get" action="{% url 'patients' %}" style="display: inline;">
                 <select id="items_per_page_bottom" name="items_per_page" onchange="this.form.submit()">
-                    <option value="10" {% if request.GET.items_per_page == '10' %}selected{% endif %}>10</option>
-                    <option value="20" {% if request.GET.items_per_page == '20' %}selected{% endif %}>20</option>
-                    <option value="50" {% if request.GET.items_per_page == '50' %}selected{% endif %}>50</option>
+                    <option value="10" {% if patients.paginator.per_page == 10 %}selected{% endif %}>10</option>
+                    <option value="20" {% if patients.paginator.per_page == 20 %}selected{% endif %}>20</option>
+                    <option value="50" {% if patients.paginator.per_page == 50 %}selected{% endif %}>50</option>
                 </select>
                 <label for="items_per_page_bottom">Per page</label>
             </form>
@@ -301,41 +305,6 @@
     {% else %}
         <h1 style="text-align: center; color: #333;">You need to be logged in to view Patients</h1>
     {% endif %}
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var selectAllCheckbox = document.getElementById('selectAllCheckbox');
-            var checkboxes = document.getElementsByName('patient_ids[]');
-            var addPatientBtn = document.querySelector('.add-btn');
-
-            selectAllCheckbox.addEventListener('change', function() {
-                checkboxes.forEach(function(checkbox) {
-                    checkbox.checked = selectAllCheckbox.checked;
-                });
-                updateButtonVisibility();
-            });
-
-            checkboxes.forEach(function(checkbox) {
-                checkbox.addEventListener('change', updateButtonVisibility);
-            });
-
-            function updateButtonVisibility() {
-                var selectedPatientIds = Array.from(checkboxes)
-                    .filter(function(checkbox) {
-                        return checkbox.checked;
-                    })
-                    .map(function(checkbox) {
-                        return checkbox.value;
-                    });
-
-                document.getElementById('selectedPatientIds').value = selectedPatientIds.join(',');
-
-                selectAllCheckbox.checked = checkboxes.length > 0 && checkboxes.length === selectedPatientIds.length;
-
-                addPatientBtn.style.display = selectedPatientIds.length > 0 ? 'none' : 'inline-block';
-            }
-        });
-    </script>
 
 </body>
 </html>

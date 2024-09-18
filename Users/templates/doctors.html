@@ -130,6 +130,11 @@
             text-decoration: none;
         }
 
+        .add-btn:hover {
+            background-color: #0056b3; 
+        }
+
+
         table {
             width: 90%;
             margin: 0 auto;
@@ -242,10 +247,6 @@
             <table>
                 <thead>
                     <tr>
-                        <th>
-                            <input type="checkbox" class="select-all-checkbox" id="selectAllCheckbox">
-                            <label for="selectAllCheckbox"></label>
-                        </th>
                         <th>Doctor Name</th>
                         <th>NPI</th>
                         <th>Specialities</th>
@@ -256,7 +257,6 @@
                 <tbody>
                     {% for doctor in doctors %}
                     <tr onclick="window.location.href='{% url 'view_doctor' doctor.doctor_id %}'" style="cursor: pointer;">
-                        <td><input type="checkbox" name="doctor_ids[]" value="{{ doctor.doctor_id}}"></td>
                         <td>{{ doctor.name}}</td>
                         <td>{{ doctor.npi}}</td>
                         <td>{{ doctor.specialities}}</td>
@@ -297,41 +297,6 @@
     {% else %}
         <h1>You need to be logged in to view Doctors</h1>
     {% endif %}
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var selectAllCheckbox = document.getElementById('selectAllCheckbox');
-            var checkboxes = document.getElementsByName('doctor_ids[]');
-            var addDoctorBtn = document.querySelector('.add-btn');
-
-            selectAllCheckbox.addEventListener('change', function() {
-                checkboxes.forEach(function(checkbox) {
-                    checkbox.checked = selectAllCheckbox.checked;
-                });
-                updateButtonVisibility();
-            });
-
-            checkboxes.forEach(function(checkbox) {
-                checkbox.addEventListener('change', updateButtonVisibility);
-            });
-
-            function updateButtonVisibility() {
-                var selectedDoctorIds = Array.from(checkboxes)
-                    .filter(function(checkbox) {
-                        return checkbox.checked;
-                    })
-                    .map(function(checkbox) {
-                        return checkbox.value;
-                    });
-
-                document.getElementById('selectedDoctorIds').value = selectedDoctorIds.join(',');
-
-                selectAllCheckbox.checked = checkboxes.length > 0 && checkboxes.length === selectedDoctorIds.length;
-
-                addDoctorBtn.style.display = selectedDoctorIds.length > 0 ? 'none' : 'inline-block';
-            }
-        });
-    </script>
 
 </body>
 </html>

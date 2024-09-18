@@ -1,5 +1,314 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    this is view clinic
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinic Detail</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f6fa;
+        }
+
+        #fixed-header {
+            top: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            background-color: #007bff;
+            color: white;
+            position: sticky;
+            z-index: 100;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #fixed-header h1 {
+            margin: 0;
+            color: white;
+            font-size: 2.5rem;
+        }
+
+        header a {
+            color: white;
+            font-size: 1.2rem;
+            padding: 10px;
+            transition: background-color 0.3s;
+        }
+
+        header a:hover {
+            background-color: #0056b3;
+            border-radius: 5px;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 15px;
+        }       
+
+        .container {
+            width: 95%;
+            margin: 15px auto;
+            padding: 15px;
+            background-color: white;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 3px;
+            font-size: 0.9rem;
+        }
+
+        .form-group input, .form-group select {
+            width: 90%;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        .form-group input:disabled {
+            background-color: #f5f6fa;
+        }
+
+        .button-container {
+            text-align: right;
+        }
+
+        .container h1 {
+            font-size: 22px; 
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .button-container button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .button-container button:hover {
+            background-color: #0056b3;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr;
+            gap: 20px;
+        }
+
+        .grid-item {
+            background-color: white;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .grid-item h2 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+            font-weight: bold;
+
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .section-header {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .login-button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .login-button:hover {
+            background-color: #0056b3;
+        }
+
+
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .bottom-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
+<body>
+    <header id="fixed-header">
+        <h1>Dental Management System</h1>
+        <nav>
+            <ul>
+                <li><a href="{% url 'dashboard' %}">Home</a></li>
+                <li><a href="{% url 'clinics' %}">Clinics</a></li>
+                <li><a href="{% url 'patients' %}">Patients</a></li>
+                <li><a href="{% url 'doctors' %}">Doctors</a></li>
+            </ul>
+        </nav>
+        {% if user.is_authenticated %}
+            <a href="{% url 'logout' %}" class="login-button">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="login-button">Login</a>
+        {% endif %}
+    </header>
+
+    <div class="container">
+        <h1>Clinic Detail</h1>
+
+        <!-- Clinic Information Form at the Top -->
+        <div class="grid-container">
+            <div class="grid-item">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="name">Clinic Name</label>
+                        <input type="text" id="name" name="name" value="{{ clinic.name }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text" id="city" name="city" value="{{ clinic.city }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="state">State</label>
+                        <input type="text" id="state" name="state" value="{{ clinic.state }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="text" id="phone" name="phone" value="{{ clinic.phone_number }}" required>
+                    </div>
+
+                    <div class="button-container">
+                        <button type="submit">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Affiliated Doctors and Add Affiliation Form side by side at the Bottom -->
+        <div class="bottom-grid">
+            <!-- Doctors Affiliation Section -->
+            <div class="grid-item">
+                <div class="section-header">Affiliated Doctors</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Doctor Name</th>
+                            <th>Office Address</th>
+                            <th>Working Schedule</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for doctor in doctors %}
+                        <tr>
+                            <td>{{ doctor.name }}</td>
+                            <td>{{ doctor.office_address }}</td>
+                            <td>{{ doctor.working_schedule }}</td>
+                            {% comment %} <td>
+                                <a href="{% url 'edit_affiliation' affiliation.id %}">Edit</a> |
+                                <a href="{% url 'delete_affiliation' affiliation.id %}">Delete</a>
+                            </td> {% endcomment %}
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4">No doctors found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Add Doctor Affiliation Form -->
+            <div class="grid-item">
+                <h2>Add Doctor Affiliation</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="doctor">Doctor Name</label>
+                        <input type="text" id="doctor" name="doctor_name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="office_address">Office Address</label>
+                        <input type="text" id="office_address" name="office_address" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="working_schedule">Working Schedule</label>
+                        <input type="text" id="working_schedule" name="working_schedule" required>
+                    </div>
+
+                    <div class="button-container">
+                        <button type="submit">Add Affiliation</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

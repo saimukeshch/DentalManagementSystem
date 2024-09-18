@@ -1,5 +1,372 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    this is view patient
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Detail</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f6fa;
+        }
+
+        #fixed-header {
+            top: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            background-color: #007bff;
+            color: white;
+            position: sticky;
+            z-index: 100;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #fixed-header h1 {
+            margin: 0;
+            color: white;
+            font-size: 2.5rem;
+        }
+
+        header a {
+            color: white;
+            font-size: 1.2rem;
+            padding: 10px;
+            transition: background-color 0.3s;
+        }
+
+        header a:hover {
+            background-color: #0056b3;
+            border-radius: 5px;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 15px;
+        }
+
+        .login-button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .login-button:hover {
+            background-color: #0056b3;
+        }
+
+        .container {
+            width: 95%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, auto);
+            gap: 20px;
+            grid-template-areas:
+                "info visits"
+                "appointment schedule";
+        }
+
+        .grid-item {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .grid-item h2 {
+            font-size: 1.5rem;
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .form-group input, .form-group select {
+            width: 90%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        .form-group input:disabled {
+            background-color: #f5f6fa;
+        }
+
+        .button-container {
+            text-align: right;
+        }
+
+        .button-container button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .button-container button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
 </head>
+<body>
+    <header id="fixed-header">
+        <h1>Dental Management System</h1>
+        <nav>
+            <ul>
+                <li><a href="{% url 'dashboard' %}">Home</a></li>
+                <li><a href="{% url 'clinics' %}">Clinics</a></li>
+                <li><a href="{% url 'patients' %}">Patients</a></li>
+                <li><a href="{% url 'doctors' %}">Doctors</a></li>
+            </ul>
+        </nav>
+        {% if user.is_authenticated %}
+            <a href="{% url 'logout' %}" class="login-button">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="login-button">Login</a>
+        {% endif %}
+    </header>
+
+    <div class="container">
+        <div class="grid-container">
+            <!-- Patient Information -->
+            <div class="grid-item">
+                <h2>Patient Information</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" value="{{ patient.name }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <input type="text" id="address" name="address" value="{{ patient.address }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="text" id="phone" name="phone" value="{{ patient.phone_number }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dob">Date of Birth</label>
+                        <input type="date" id="dob" name="dob" value="{{ patient.date_of_birth }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ssn">Last 4 Digits of SSN</label>
+                        <input type="text" id="ssn" name="ssn" value="{{ patient.ssn }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="gender">Gender</label>
+                        <select id="gender" name="gender" required>
+                            <option value="Male" {% if patient.gender == 'Male' %}selected{% endif %}>Male</option>
+                            <option value="Female" {% if patient.gender == 'Female' %}selected{% endif %}>Female</option>
+                            <option value="Other" {% if patient.gender == 'Other' %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+
+                    <div class="button-container">
+                        <button type="submit">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Patient Visits -->
+            <div class="grid-item">
+                <h2>Patient Visits</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Visit Date and Time</th>
+                            <th>Doctor Name</th>
+                            <th>Clinic Name</th>
+                            <th>Procedures Done</th>
+                            <th>Doctor's Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for visit in patient.visits %}
+                        <tr>
+                            <td>{{ visit.date_time }}</td>
+                            <td>{{ visit.doctor_name }}</td>
+                            <td>{{ visit.clinic_name }}</td>
+                            <td>{{ visit.procedures_done }}</td>
+                            <td>{{ visit.doctor_notes }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5">No visits found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Next Scheduled Appointment -->
+            <div class="grid-item">
+                <h2>Next Scheduled Appointment</h2>
+                {% if patient.next_appointment %}
+                    <p><strong>Date:</strong> {{ patient.next_appointment.date }}</p>
+                    <p><strong>Time:</strong> {{ patient.next_appointment.time }}</p>
+                    <p><strong>Clinic:</strong> {{ patient.next_appointment.clinic }}</p>
+                    <p><strong>Doctor:</strong> {{ patient.next_appointment.doctor }}</p>
+                    <p><strong>Procedure Booked:</strong> {{ patient.next_appointment.procedure }}</p>
+                    <p><strong>Date Booked:</strong> {{ patient.next_appointment.date_booked }}</p>
+                {% else %}
+                    <p>No upcoming appointments scheduled.</p>
+                {% endif %}
+            </div>
+
+            <!-- Schedule an Appointment -->
+            <div class="grid-item">
+                <h2>Schedule an Appointment</h2>
+                <form class="appointment-form" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="procedure">Select Procedure</label>
+                        <select id="procedure" name="procedure" required>
+                            <option value="">Select Procedure</option>
+                            {% for procedure in procedures %}
+                            <option value="{{ procedure.id }}">{{ procedure.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="clinic">Select Clinic</label>
+                        <select id="clinic" name="clinic" required>
+                            <option value="">Select Clinic</option>
+                            <!-- Options will be populated based on selected procedure -->
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="doctor">Select Doctor</label>
+                        <select id="doctor" name="doctor" required>
+                            <!-- Options will be populated based on selected clinic -->
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="date">Select Date</label>
+                        <input type="date" id="date" name="date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="time">Select Time</label>
+                        <input type="time" id="time" name="time" required>
+                    </div>
+
+                    <div class="button-container">
+                        <button type="submit">Schedule Appointment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript to dynamically populate clinics and doctors based on the selected procedure and clinic
+        document.getElementById('procedure').addEventListener('change', function() {
+            var procedureId = this.value;
+            // Fetch clinics that offer the selected procedure
+            fetch(`/api/clinics?procedure=${procedureId}`)
+                .then(response => response.json())
+                .then(data => {
+                    var clinicSelect = document.getElementById('clinic');
+                    clinicSelect.innerHTML = '<option value="">Select Clinic</option>';
+                    data.clinics.forEach(clinic => {
+                        var option = document.createElement('option');
+                        option.value = clinic.id;
+                        option.textContent = clinic.name;
+                        clinicSelect.appendChild(option);
+                    });
+                });
+        });
+
+        document.getElementById('clinic').addEventListener('change', function() {
+            var clinicId = this.value;
+            // Fetch doctors that are available in the selected clinic
+            fetch(`/api/doctors?clinic=${clinicId}`)
+                .then(response => response.json())
+                .then(data => {
+                    var doctorSelect = document.getElementById('doctor');
+                    doctorSelect.innerHTML = '<option value="">Select Doctor</option>';
+                    data.doctors.forEach(doctor => {
+                        var option = document.createElement('option');
+                        option.value = doctor.id;
+                        option.textContent = doctor.name;
+                        doctorSelect.appendChild(option);
+                    });
+                });
+        });
+    </script>
+</body>
+</html>

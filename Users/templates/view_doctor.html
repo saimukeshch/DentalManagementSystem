@@ -113,6 +113,29 @@
             background-color: #0056b3;
         }
 
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto;
+            gap: 15px;
+            grid-template-areas:
+                "form form"
+                "affiliations patients";
+        }
+
+        .grid-item {
+            background-color: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .grid-item h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -138,10 +161,12 @@
         }
 
         .section-header {
+            font-weight: bold;
             font-size: 1.5rem;
             margin-bottom: 10px;
             border-bottom: 2px solid #007bff;
             padding-bottom: 5px;
+
         }
 
         .login-button {
@@ -180,85 +205,161 @@
     </header>
 
     <div class="container">
-        <h1>Doctor Detail</h1>
+        <h1>Doctor Details</h1>
+        <div class="grid-container">
+            <div class="grid-item" style="grid-area: form;">
+                <form method="post" action="{% url 'add_doctor' %}">
+                    {% csrf_token %}
+                    <div class="form-group" hidden>
+                        <label for="doctor_id">Doctor ID</label>
+                        <input type="text" id="doctor_id" name="doctor_id" value="{{ doctor.doctor_id }}">
+                    </div>
 
-        <form method="post" >
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="npi">NPI</label>
-                <input type="text" id="npi" name="npi" value="{{ doctor.npi }}" required>
+                    <div class="form-group">
+                        <label for="npi">NPI</label>
+                        <input type="text" id="npi" name="npi" value="{{ doctor.npi }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" value="{{ doctor.name }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" value="{{ doctor.email }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="text" id="phone" name="phone_number" value="{{ doctor.phone_number }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="specialties">Specialties</label>
+                        <div id="specialties-container">
+                            {% for specialty in doctor.specialties.all %}
+                            <span class="specialty-pill">
+                                {{ specialty.name }}
+                                <button type="button" class="remove-specialty-btn" data-specialty-id="{{ specialty.id }}">&times;</button>
+                            </span>
+                            {% endfor %}
+                        </div>
+                        <select id="add-specialty-dropdown" name="specialties">
+                            <option value="">Add Specialty</option>
+                            {% for specialty in all_specialties %}
+                            <option value="{{ specialty.id }}">{{ specialty.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="hidden" id="specialties-hidden-input" name="specialties_hidden">
+                    </div>
+
+                    <div class="button-container">
+                        <button type="submit">Save Changes</button>
+                    </div>
+                </form>
             </div>
 
-            <div class="form-group">
-                <label for="name">Name</label>
-                <input type="text" id="name" name="name" value="{{ doctor.name }}" required>
+            <div class="grid-item" style="grid-area: affiliations;">
+                <div class="section-header">Affiliations with Clinics</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Clinic Name</th>
+                            <th>City</th>
+                            <th>State</th>
+                            <th>Contact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for clinic in affiliated_clinics %}
+                        <tr>
+                            <td>{{ clinic.name }}</td>
+                            <td>{{ clinic.city }}</td>
+                            <td>{{ clinic.state }}</td>
+                            <td>{{ clinic.phone_number }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3">No affiliations found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
 
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" value="{{ doctor.email }}" required>
+            <div class="grid-item" style="grid-area: patients;">
+                <div class="section-header">Affiliated Patients</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Patient Name</th>
+                            <th>Date of Birth</th>
+                            <th>Gender</th>
+                            <th>Contact Info</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for patient in affiliated_patients %}
+                        <tr>
+                            <td>{{ patient.name }}</td>
+                            <td>{{ patient.date_of_birth }}</td>
+                            <td>{{ patient.gender }}
+                            <td>{{ patient.phone_number }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="2">No patients found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-
-            <div class="form-group">
-                <label for="phone">Phone Number</label>
-                <input type="text" id="phone" name="phone" value="{{ doctor.phone_number }}" required>
-            </div>
-
-            <div class="form-group">
-                <label for="specialties">Offered Procedures (Specialties)</label>
-                <input type="text" id="specialties" name="specialties" value="{{ doctor.specialties }}" required>
-            </div>
-
-            <div class="button-container">
-                <button type="submit">Save Changes</button>
-            </div>
-        </form>
-
-        <div class="section-header">Affiliations with Clinics</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Clinic Name</th>
-                    <th>Office Address</th>
-                    <th>Working Schedule</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for affiliation in doctor.affiliations %}
-                <tr>
-                    <td>{{ affiliation.clinic_name }}</td>
-                    <td>{{ affiliation.office_address }}</td>
-                    <td>{{ affiliation.working_schedule }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="3">No affiliations found</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <div class="section-header">Affiliated Patients</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Patient Name</th>
-                    <th>Contact Info</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for patient in doctor.patients %}
-                <tr>
-                    <td>{{ patient.name }}</td>
-                    <td>{{ patient.contact_info }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="2">No patients found</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const specialtiesContainer = document.getElementById('specialties-container');
+            const addSpecialtyDropdown = document.getElementById('add-specialty-dropdown');
+            const specialtiesHiddenField = document.getElementById('specialties-hidden-input');
+    
+            // Function to update hidden field with cleaned specialties
+            function updateSpecialtiesHiddenField() {
+                const specialtyPills = specialtiesContainer.querySelectorAll('.specialty-pill');
+                const specialtiesArray = Array.from(specialtyPills).map(pill => pill.textContent.replace('×', '').trim());
+                specialtiesHiddenField.value = specialtiesArray.join(', ');
+            }
+    
+            addSpecialtyDropdown.addEventListener('change', function() {
+                const specialtyId = this.value;
+                const specialtyName = this.options[this.selectedIndex].text;
+                
+                if (specialtyId) {
+                    const newPill = document.createElement('span');
+                    newPill.classList.add('specialty-pill');
+                    newPill.innerHTML = specialtyName + 
+                    ' <button type="button" class="remove-specialty-btn" data-specialty-id="' + specialtyId + '">&times;</button>';
+                    specialtiesContainer.appendChild(newPill);
+    
+                    // Update hidden field whenever new specialty is added
+                    updateSpecialtiesHiddenField();
+                }
+    
+                this.value = ''; // Reset dropdown after adding
+            });
+    
+            specialtiesContainer.addEventListener('click', function(event) {
+                if (event.target.classList.contains('remove-specialty-btn')) {
+                    const specialtyPill = event.target.closest('.specialty-pill');
+                    specialtyPill.remove();
+                    
+                    // Update hidden field whenever a specialty is removed
+                    updateSpecialtiesHiddenField();
+                }
+            });
+    
+            // Initial call to update hidden field if there are pre-existing specialties
+            updateSpecialtiesHiddenField();
+        });
+    </script>    
 </body>
 </html>

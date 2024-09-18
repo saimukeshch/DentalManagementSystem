@@ -247,22 +247,17 @@
             <table>
                 <thead>
                     <tr>
-                        <th>
-                            <input type="checkbox" class="select-all-checkbox" id="selectAllCheckbox">
-                            <label for="selectAllCheckbox"></label>
-                        </th>
                         <th>Clinic Name</th>
                         <th>City</th>
-                        <th>Country</th>
-                        <th>City</th>
+                        <th>State</th>
+                        <th>Contact</th>
                         <th>Number of affiliated Doctors</th>
                         <th>Number of affiliated patients</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for clinic in clinics %}
-                    <tr>
-                        <td><input type="checkbox" name="clinic_ids[]" value="{{ clinic.id }}"></td>
+                    <tr onclick="window.location.href='{% url 'view_clinic' clinic.clinic_id %}'" style="cursor: pointer;">
                         <td>{{ clinic.name }}</td>
                         <td>{{ clinic.city }}</td>
                         <td>{{ clinic.state }}</td>
@@ -302,14 +297,5 @@
         </div>
     {% endif %}
 
-    <script>
-        document.getElementById('selectAllCheckbox').addEventListener('change', function() {
-            var checkboxes = document.querySelectorAll('input[name="clinic_ids[]"]');
-            for (var checkbox of checkboxes) {
-                checkbox.checked = this.checked;
-            }
-        });
-
-    </script>
 </body>
 </html>
