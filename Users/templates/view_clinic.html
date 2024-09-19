@@ -19,7 +19,7 @@
             width: 100%;
             text-align: center;
             padding: 20px;
-            background-color: #007bff;
+            background: linear-gradient(135deg, #0056b3, #007bff);
             color: white;
             position: sticky;
             z-index: 100;
@@ -37,6 +37,7 @@
             font-size: 1.2rem;
             padding: 10px;
             transition: background-color 0.3s;
+            text-decoration: none;
         }
 
         header a:hover {
@@ -197,6 +198,23 @@
                 grid-template-columns: 1fr;
             }
         }
+        .checkbox-group {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        
+        .checkbox-group div {
+            margin-bottom: 10px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        
+        .checkbox-group label {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -218,7 +236,7 @@
     </header>
 
     <div class="container">
-        <h1>Clinic Detail</h1>
+        <h1>Clinic Details</h1>
 
         <!-- Clinic Information Form at the Top -->
         <div class="grid-container">
@@ -264,15 +282,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for doctor in doctors %}
+                        {% for doctor in affiliated_doctors %}
                         <tr>
                             <td>{{ doctor.name }}</td>
                             <td>{{ doctor.office_address }}</td>
                             <td>{{ doctor.working_schedule }}</td>
-                            {% comment %} <td>
-                                <a href="{% url 'edit_affiliation' affiliation.id %}">Edit</a> |
-                                <a href="{% url 'delete_affiliation' affiliation.id %}">Delete</a>
-                            </td> {% endcomment %}
+                            <td>
+                                <a href="">Edit</a> |
+                                <a href="">Delete</a>
+                            </td>
                         </tr>
                         {% empty %}
                         <tr>
@@ -286,11 +304,16 @@
             <!-- Add Doctor Affiliation Form -->
             <div class="grid-item">
                 <h2>Add Doctor Affiliation</h2>
-                <form method="post">
+                <form method="post" action="{% url 'add_doctor_affiliation' clinic.clinic_id%}">
                     {% csrf_token %}
                     <div class="form-group">
                         <label for="doctor">Doctor Name</label>
-                        <input type="text" id="doctor" name="doctor_name" required>
+                        <select id="doctor_name" name="specialties">
+                            <option value="">Select Doctor</option>
+                            {% for doctor in doctors %}
+                            <option value="{{ doctor.id }}">{{ doctor.name }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
 
                     <div class="form-group">
@@ -299,8 +322,54 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="working_schedule">Working Schedule</label>
-                        <input type="text" id="working_schedule" name="working_schedule" required>
+                        <label for="Working_day">Working Days</label>
+                    </div>
+                    <div>
+                        <div>
+                            <input type="checkbox" id="monday" name="working_days" value="Monday">
+                            <label for="monday">Monday</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="tuesday" name="working_days" value="Tuesday">
+                            <label for="tuesday">Tuesday</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="wednesday" name="working_days" value="Wednesday">
+                            <label for="wednesday">Wednesday</label>
+                        </div>    
+                        <div>
+                            <input type="checkbox" id="thursday" name="working_days" value="Thursday">
+                            <label for="thursday">Thursday</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="friday" name="working_days" value="Friday">
+                            <label for="friday">Friday</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="saturday" name="working_days" value="Saturday">
+                            <label for="saturday">Saturday</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="sunday" name="working_days" value="Sunday">
+                            <label for="sunday">Sunday</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="weekdays" name="working_days" value="Weekdays">
+                            <label for="sunday">Weekdays</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="weekends" name="working_days" value="Weekends">
+                            <label for="sunday">Weekends</label>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="working_schedule_start_time">Start Time</label>
+                        <input type="time" id="working_schedule_start_time" name="working_schedule_start_time" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="working_schedule_end_time">End Time</label>
+                        <input type="time" id="working_schedule_end_time" name="working_schedule_end_time" required class="form-control">
                     </div>
 
                     <div class="button-container">

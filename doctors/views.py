@@ -47,12 +47,12 @@ def add_doctor(request):
                 if not current_specialties.filter(name=specialty_name).exists():
                     specialty = get_object_or_404(Specialty, name=specialty_name)
                     doctor.specialties.add(specialty)
-
+                
             # Remove specialties that are no longer in the form
             for specialty in current_specialties:
                 if specialty.name not in specialties_list:
                     doctor.specialties.remove(specialty)
-                    
+               
         return HttpResponseRedirect(reverse('doctors'))
     return render(request, 'add_doctor.html',{'all_specialties' : Specialty.objects.all()})
 
@@ -72,3 +72,5 @@ def view_doctor(request,doctor_id):
         'all_specialties' : Specialty.objects.all()
     }
     return render(request,'view_doctor.html', context)
+
+

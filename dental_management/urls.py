@@ -33,6 +33,7 @@ urlpatterns = [
     path('add_clinic/',cliViews.add_clinic, name = 'add_clinic'),
     path('edit_clinic/',cliViews.edit_clinic, name = 'edit_clinic'),
     path('view_clinic/<int:clinic_id>',cliViews.view_clinic, name = 'view_clinic'),
+    path('add_doctor_affiliation/<int:clinic_id>',cliViews.add_doctor_affiliation, name = 'add_doctor_affiliation'),
     path('delete_clinic/',cliViews.delete_clinic, name = 'delete_clinic'),
     path('add_doctor/',docViews.add_doctor, name = 'add_doctor'),
     # path('edit_doctor/',docViews.edit_doctor, name = 'edit_doctor'),

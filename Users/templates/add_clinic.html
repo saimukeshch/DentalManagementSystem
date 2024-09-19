@@ -1,5 +1,267 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    this is add clinic
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Detail</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f6fa;
+        }
+
+        #fixed-header {
+            top: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            background-color: #007bff;
+            color: white;
+            position: sticky;
+            z-index: 100;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #fixed-header h1 {
+            margin: 0;
+            color: white;
+            font-size: 2.5rem;
+        }
+
+        header a {
+            color: white;
+            font-size: 1.2rem;
+            padding: 10px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+        }
+
+        header a:hover {
+            background-color: #0056b3;
+            border-radius: 5px;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 15px;
+        }       
+
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        .form-group input:disabled {
+            background-color: #f5f6fa;
+        }
+
+        .button-container {
+            text-align: right;
+        }
+
+        .container h1 {
+            font-size: 26px; 
+            color: #333;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .button-container button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .button-container button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .section-header {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+        }
+
+        .login-button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .login-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
+<body>
+    <header id="fixed-header">
+        <h1>Dental Management System</h1>
+        <nav>
+            <ul>
+                <li><a href="{% url 'dashboard' %}">Home</a></li>
+                <li><a href="{% url 'clinics' %}">Clinics</a></li>
+                <li><a href="{% url 'patients' %}">Patients</a></li>
+                <li><a href="{% url 'doctors' %}">Doctors</a></li>
+            </ul>
+        </nav>
+        {% if user.is_authenticated %}
+            <a href="{% url 'logout' %}" class="login-button">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="login-button">Login</a>
+        {% endif %}
+    </header>
+
+    <div class="container">
+        <h1>Clinic Details</h1>
+        <!-- Clinic Information Form at the Top -->
+        <div class="grid-container">
+            <div class="grid-item">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="name">Clinic Name</label>
+                        <input type="text" id="name" name="name" value="{{ clinic.name }}" required>
+                    </div>
+    
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input type="text" id="city" name="city" value="{{ clinic.city }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="state">State</label>
+                        <input type="text" id="state" name="state" value="{{ clinic.state }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="text" id="phone" name="phone" value="{{ clinic.phone_number }}" required>
+                    </div>
+    
+                    <div class="button-container">
+                        <button type="submit">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const specialtiesContainer = document.getElementById('specialties-container');
+            const addSpecialtyDropdown = document.getElementById('add-specialty-dropdown');
+            const specialtiesHiddenField = document.getElementById('specialties-hidden-input');
+    
+            // Function to update hidden field with cleaned specialties
+            function updateSpecialtiesHiddenField() {
+                const specialtyPills = specialtiesContainer.querySelectorAll('.specialty-pill');
+                const specialtiesArray = Array.from(specialtyPills).map(pill => pill.textContent.replace('×', '').trim());
+                specialtiesHiddenField.value = specialtiesArray.join(', ');
+            }
+    
+            addSpecialtyDropdown.addEventListener('change', function() {
+                const specialtyId = this.value;
+                const specialtyName = this.options[this.selectedIndex].text;
+                
+                if (specialtyId) {
+                    const newPill = document.createElement('span');
+                    newPill.classList.add('specialty-pill');
+                    newPill.innerHTML = specialtyName + 
+                    ' <button type="button" class="remove-specialty-btn" data-specialty-id="' + specialtyId + '">&times;</button>';
+                    specialtiesContainer.appendChild(newPill);
+    
+                    // Update hidden field whenever new specialty is added
+                    updateSpecialtiesHiddenField();
+                }
+    
+                this.value = ''; // Reset dropdown after adding
+            });
+    
+            specialtiesContainer.addEventListener('click', function(event) {
+                if (event.target.classList.contains('remove-specialty-btn')) {
+                    const specialtyPill = event.target.closest('.specialty-pill');
+                    specialtyPill.remove();
+                    
+                    // Update hidden field whenever a specialty is removed
+                    updateSpecialtiesHiddenField();
+                }
+            });
+    
+            // Initial call to update hidden field if there are pre-existing specialties
+            updateSpecialtiesHiddenField();
+        });
+    </script>    
+</body>
+</html>
+
+
+
+
+

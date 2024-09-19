@@ -8,7 +8,7 @@ class Doctor(models.Model):
     email = models.EmailField()
     phone_number = models.CharField(max_length=20)
     specialties = models.ManyToManyField('Specialty', related_name='doctors')
-    clinics = models.ManyToManyField(Clinic, related_name='doctors')
+    clinics = models.ManyToManyField(Clinic, through='Doctor_Clinic', related_name='doctors')
 
     def __str__(self):
         return self.name
@@ -31,3 +31,15 @@ class Specialty(models.Model):
 
     def __str__(self):
         return self.name
+    
+class Doctor_Clinic(models.Model):
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE)
+    office_address = models.CharField(max_length=255)
+    working_schedule = models.CharField(max_length=255)
+
+    class Meta:
+        unique_together = ('doctor', 'clinic')
+
+    def __str__(self):
+        return f"{self.doctor.name} at {self.clinic.name}"

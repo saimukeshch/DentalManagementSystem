@@ -13,7 +13,6 @@ class Clinic(models.Model):
 
     @property
     def number_of_affiliated_doctors(self):
-        print(self.doctors)
         return self.doctors.count()
     
     @property
