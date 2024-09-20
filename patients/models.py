@@ -6,7 +6,7 @@ class Patient(models.Model):
     patient_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
     date_of_birth = models.DateField()
-    last_4_ssn = models.CharField(max_length=4)
+    ssn = models.CharField(max_length=11)
     gender = models.CharField(max_length=10)
     address = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=20)
@@ -16,6 +16,11 @@ class Patient(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def masked_ssn(self):
+        if self.ssn and len(self.ssn) == 11: 
+            return f"***-**-{self.ssn[-4:]}"
+        return self.ssn
 
 class Visit(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
@@ -36,6 +41,8 @@ class Appointment(models.Model):
     procedure = models.ForeignKey(Specialty, on_delete=models.SET_NULL, null=True)
     appointment_date_time = models.DateTimeField()
     date_booked = models.DateTimeField(auto_now_add=True)
+    is_visited = models.BooleanField(default=True)
+    doctor_notes = models.TextField(default="")
 
     def __str__(self):
         return f"Appointment on {self.appointment_date_time} for {self.patient.name}"

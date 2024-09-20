@@ -5,6 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clinic Detail</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         body {
             margin: 0;
@@ -13,6 +15,13 @@
             background-color: #f5f6fa;
         }
 
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f6fa;
+            }
+    
         #fixed-header {
             top: 0;
             left: 0;
@@ -36,25 +45,40 @@
             color: white;
             font-size: 1.2rem;
             padding: 10px;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, box-shadow 0.3s;
             text-decoration: none;
+        }
+
+        header a:visited, 
+        header a:focus,
+        header a:active {
+            color: white; 
         }
 
         header a:hover {
             background-color: #0056b3;
             border-radius: 5px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         nav ul {
             list-style: none;
             padding: 0;
+            margin-top: 15px;
         }
 
         nav ul li {
             display: inline;
             margin-right: 15px;
-        }       
+        }
 
+        h1 {
+            color: #333;
+            font-size: 2rem;
+            text-align: center;
+            margin: 40px 0;
+        }
+            
         .container {
             width: 95%;
             margin: 15px auto;
@@ -92,7 +116,7 @@
         }
 
         .container h1 {
-            font-size: 22px; 
+            font-size: 26px; 
             color: #333;
             text-align: center;
             margin-bottom: 20px;
@@ -171,15 +195,17 @@
         }
 
         .login-button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
             position: fixed;
             top: 20px;
             right: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, box-shadow 0.3s;
             text-decoration: none;
-            transition: background-color 0.3s;
+            z-index: 101; 
         }
 
         .login-button:hover {
@@ -229,20 +255,24 @@
             </ul>
         </nav>
         {% if user.is_authenticated %}
-            <a href="{% url 'logout' %}" class="login-button">Logout</a>
+            <a href="{% url 'logout' %}" class="login-button">Log out</a>
         {% else %}
-            <a href="{% url 'login' %}" class="login-button">Login</a>
+            <a href="{% url 'login' %}" class="login-button">Log in</a>
         {% endif %}
     </header>
 
     <div class="container">
         <h1>Clinic Details</h1>
 
-        <!-- Clinic Information Form at the Top -->
         <div class="grid-container">
             <div class="grid-item">
-                <form method="post">
+                <form method="post" action="{% url 'add_clinic'%}">
                     {% csrf_token %}
+                    <div class="form-group" hidden>
+                        <label for="clinic_id">Clinic ID</label>
+                        <input type="text" id="clinic_id" name="clinic_id" value="{{ clinic.clinic_id }}">
+                    </div>
+
                     <div class="form-group">
                         <label for="name">Clinic Name</label>
                         <input type="text" id="name" name="name" value="{{ clinic.name }}" required>
@@ -257,8 +287,13 @@
                         <input type="text" id="state" name="state" value="{{ clinic.state }}" required>
                     </div>
                     <div class="form-group">
-                        <label for="phone">Phone Number</label>
-                        <input type="text" id="phone" name="phone" value="{{ clinic.phone_number }}" required>
+                        <label for="phone_number">Phone Number</label>
+                        <input type="text" id="phone_number" name="phone_number" value="{{ clinic.phone_number }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" value="{{ clinic.email }}" required>
                     </div>
 
                     <div class="button-container">
@@ -268,9 +303,7 @@
             </div>
         </div>
 
-        <!-- Affiliated Doctors and Add Affiliation Form side by side at the Bottom -->
         <div class="bottom-grid">
-            <!-- Doctors Affiliation Section -->
             <div class="grid-item">
                 <div class="section-header">Affiliated Doctors</div>
                 <table>
@@ -284,12 +317,17 @@
                     <tbody>
                         {% for doctor in affiliated_doctors %}
                         <tr>
-                            <td>{{ doctor.name }}</td>
-                            <td>{{ doctor.office_address }}</td>
-                            <td>{{ doctor.working_schedule }}</td>
+                            <td contenteditable="false">{{ doctor.name }}</td>
+                            <td contenteditable="false">{{ doctor.office_address }}</td>
+                            <td contenteditable="false">{{ doctor.working_schedule }}</td>
                             <td>
-                                <a href="">Edit</a> |
-                                <a href="">Delete</a>
+                                <button onclick="editRow(this)" class="btn btn-primary btn-sm"><i class="bi bi-pencil-square"></i></button>
+                                <form action="{% url 'delete_affiliation' clinic.clinic_id doctor.id %}" method="post" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                         {% empty %}
@@ -301,17 +339,16 @@
                 </table>
             </div>
 
-            <!-- Add Doctor Affiliation Form -->
             <div class="grid-item">
                 <h2>Add Doctor Affiliation</h2>
                 <form method="post" action="{% url 'add_doctor_affiliation' clinic.clinic_id%}">
                     {% csrf_token %}
                     <div class="form-group">
-                        <label for="doctor">Doctor Name</label>
-                        <select id="doctor_name" name="specialties">
+                        <label for="doctor_name">Doctor Name</label>
+                        <select id="doctor_name" name="doctor_name">
                             <option value="">Select Doctor</option>
                             {% for doctor in doctors %}
-                            <option value="{{ doctor.id }}">{{ doctor.name }}</option>
+                                <option value="{{ doctor.doctor_id }}">{{ doctor.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -353,14 +390,6 @@
                             <input type="checkbox" id="sunday" name="working_days" value="Sunday">
                             <label for="sunday">Sunday</label>
                         </div>
-                        <div>
-                            <input type="checkbox" id="weekdays" name="working_days" value="Weekdays">
-                            <label for="sunday">Weekdays</label>
-                        </div>
-                        <div>
-                            <input type="checkbox" id="weekends" name="working_days" value="Weekends">
-                            <label for="sunday">Weekends</label>
-                        </div>
                     </div>
                     <br>
                     <div class="form-group">
@@ -379,5 +408,29 @@
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function editRow(button) {
+            var row = button.closest('tr');
+            var editables = row.querySelectorAll('.editable');
+            if (button.classList.contains('editing')) {
+                editables.forEach(element => {
+                    element.setAttribute('contenteditable', 'false');
+                });
+                button.classList.remove('editing');
+                button.innerHTML = '<i class="bi bi-pencil-square"></i>';
+            } else {
+                // Enable editing
+                editables.forEach(element => {
+                    element.setAttribute('contenteditable', 'true');
+                    // Focus the first editable element
+                    editables[0].focus();
+                });
+                button.classList.add('editing');
+                button.innerHTML = '<i class="bi bi-save"></i>';
+            }
+        }
+    </script>
 </body>
 </html>

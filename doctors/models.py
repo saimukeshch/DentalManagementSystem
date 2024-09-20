@@ -7,7 +7,7 @@ class Doctor(models.Model):
     name = models.CharField(max_length=255)
     email = models.EmailField()
     phone_number = models.CharField(max_length=20)
-    specialties = models.ManyToManyField('Specialty', related_name='doctors')
+    specialities = models.ManyToManyField('Specialty', related_name='doctors')
     clinics = models.ManyToManyField(Clinic, through='Doctor_Clinic', related_name='doctors')
 
     def __str__(self):
@@ -23,8 +23,8 @@ class Doctor(models.Model):
         return Appointment.objects.filter(doctor=self).values('patient').distinct().count()
     
     @property
-    def specialties_names(self):
-        return ', '.join(self.specialties.values_list('name', flat=True))
+    def specialities_names(self):
+        return ', '.join(self.specialities.values_list('name', flat=True))
     
 class Specialty(models.Model):
     name = models.CharField(max_length=100)
@@ -33,6 +33,7 @@ class Specialty(models.Model):
         return self.name
     
 class Doctor_Clinic(models.Model):
+    id = models.AutoField(primary_key=True)
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
     clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE)
     office_address = models.CharField(max_length=255)

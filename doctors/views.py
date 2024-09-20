@@ -6,7 +6,6 @@ from django.http import HttpResponseRedirect
 from django.apps import apps
 from django.urls import reverse
 
-# Create your views here.
 def doctors(request):
     all_doctors = Doctor.objects.all().order_by('doctor_id')
     if request.method == 'POST':
@@ -14,7 +13,7 @@ def doctors(request):
         all_doctors = all_doctors.filter(Q(name__icontains=search_str)|Q(npi__icontains=search_str))
 
     for doc in all_doctors:
-        doc.specialities = doc.specialties_names
+        doc.specialities_str = doc.specialities_names
         doc.clinic = doc.number_of_affiliated_clinics
         doc.patient = doc.number_of_affiliated_patients
 
@@ -34,31 +33,28 @@ def add_doctor(request):
         doctor.phone_number = request.POST['phone_number']
         doctor.save()
         
-        # Handle specialties: only add new specialties
-        specialties_str = request.POST.get('specialties_hidden', '')
+        specialities_str = request.POST.get('specialities_hidden', '')
         
-        if specialties_str:
-            specialties_list = [spec.strip() for spec in specialties_str.split(',')]
+        if specialities_str:
+            specialities_list = [spec.strip() for spec in specialities_str.split(',')]
             
-            current_specialties = doctor.specialties.all()
+            current_specialities = doctor.specialities.all()
             
-            # Add new specialties
-            for specialty_name in specialties_list:
-                if not current_specialties.filter(name=specialty_name).exists():
+            for specialty_name in specialities_list:
+                if not current_specialities.filter(name=specialty_name).exists():
                     specialty = get_object_or_404(Specialty, name=specialty_name)
-                    doctor.specialties.add(specialty)
+                    doctor.specialities.add(specialty)
                 
-            # Remove specialties that are no longer in the form
-            for specialty in current_specialties:
-                if specialty.name not in specialties_list:
-                    doctor.specialties.remove(specialty)
+            for specialty in current_specialities:
+                if specialty.name not in specialities_list:
+                    doctor.specialities.remove(specialty)
                
         return HttpResponseRedirect(reverse('doctors'))
-    return render(request, 'add_doctor.html',{'all_specialties' : Specialty.objects.all()})
+    return render(request, 'add_doctor.html',{'all_specialities' : Specialty.objects.all()})
 
 def view_doctor(request,doctor_id):
     doctor = get_object_or_404(Doctor, doctor_id=doctor_id)
-    doctor.specialities = doctor.specialties_names
+    doctor.specialities_str = doctor.specialities_names
     Appointment = apps.get_model('patients', 'Appointment')
     patients = Appointment.objects.filter(doctor=doctor).values('patient').distinct()
     affiliated_patients =[]
@@ -69,7 +65,7 @@ def view_doctor(request,doctor_id):
         'doctor': doctor,
         'affiliated_patients': affiliated_patients,
         'affiliated_clinics': affiliated_clinics,
-        'all_specialties' : Specialty.objects.all()
+        'all_specialities' : Specialty.objects.all()
     }
     return render(request,'view_doctor.html', context)
 

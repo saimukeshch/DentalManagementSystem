@@ -15,6 +15,13 @@
             background-color: #f5f6fa;
         }
 
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f6fa;
+            }
+    
         #fixed-header {
             top: 0;
             left: 0;
@@ -38,24 +45,39 @@
             color: white;
             font-size: 1.2rem;
             padding: 10px;
-            transition: background-color 0.3s;                        
+            transition: background-color 0.3s, box-shadow 0.3s;
             text-decoration: none;
+        }
+
+        header a:visited, 
+        header a:focus,
+        header a:active {
+            color: white; 
         }
 
         header a:hover {
             background-color: #0056b3;
             border-radius: 5px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         nav ul {
             list-style: none;
             padding: 0;
+            margin-top: 15px;
         }
 
         nav ul li {
             display: inline;
             margin-right: 15px;
-        }       
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2rem;
+            text-align: center;
+            margin: 40px 0;
+        }
 
         .container {
             width: 80%;
@@ -199,9 +221,9 @@
             </ul>
         </nav>
         {% if user.is_authenticated %}
-            <a href="{% url 'logout' %}" class="login-button">Logout</a>
+            <a href="{% url 'logout' %}" class="login-button">Log out</a>
         {% else %}
-            <a href="{% url 'login' %}" class="login-button">Login</a>
+            <a href="{% url 'login' %}" class="login-button">Log in</a>
         {% endif %}
     </header>
 
@@ -232,27 +254,27 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="phone">Phone Number</label>
-                        <input type="text" id="phone" name="phone_number" value="{{ doctor.phone_number }}" required>
+                        <label for="phone_number">Phone Number</label>
+                        <input type="text" id="phone_number" name="phone_number" value="{{ doctor.phone_number }}" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="specialties">Specialties</label>
-                        <div id="specialties-container">
-                            {% for specialty in doctor.specialties.all %}
+                        <label for="specialities">Specialities</label>
+                        <div id="specialities-container">
+                            {% for specialty in doctor.specialities.all %}
                             <span class="specialty-pill">
                                 {{ specialty.name }}
                                 <button type="button" class="remove-specialty-btn" data-specialty-id="{{ specialty.id }}">&times;</button>
                             </span>
                             {% endfor %}
                         </div>
-                        <select id="add-specialty-dropdown" name="specialties">
+                        <select id="add-specialty-dropdown" name="specialities">
                             <option value="">Add Specialty</option>
-                            {% for specialty in all_specialties %}
+                            {% for specialty in all_specialities %}
                             <option value="{{ specialty.id }}">{{ specialty.name }}</option>
                             {% endfor %}
                         </select>
-                        <input type="hidden" id="specialties-hidden-input" name="specialties_hidden">
+                        <input type="hidden" id="specialities-hidden-input" name="specialities_hidden">
                     </div>
 
                     <div class="button-container">
@@ -319,15 +341,15 @@
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const specialtiesContainer = document.getElementById('specialties-container');
+            const specialitiesContainer = document.getElementById('specialities-container');
             const addSpecialtyDropdown = document.getElementById('add-specialty-dropdown');
-            const specialtiesHiddenField = document.getElementById('specialties-hidden-input');
+            const specialitiesHiddenField = document.getElementById('specialities-hidden-input');
     
-            // Function to update hidden field with cleaned specialties
-            function updateSpecialtiesHiddenField() {
-                const specialtyPills = specialtiesContainer.querySelectorAll('.specialty-pill');
-                const specialtiesArray = Array.from(specialtyPills).map(pill => pill.textContent.replace('×', '').trim());
-                specialtiesHiddenField.value = specialtiesArray.join(', ');
+            // Function to update hidden field with cleaned specialities
+            function updatespecialitiesHiddenField() {
+                const specialtyPills = specialitiesContainer.querySelectorAll('.specialty-pill');
+                const specialitiesArray = Array.from(specialtyPills).map(pill => pill.textContent.replace('×', '').trim());
+                specialitiesHiddenField.value = specialitiesArray.join(', ');
             }
     
             addSpecialtyDropdown.addEventListener('change', function() {
@@ -339,27 +361,27 @@
                     newPill.classList.add('specialty-pill');
                     newPill.innerHTML = specialtyName + 
                     ' <button type="button" class="remove-specialty-btn" data-specialty-id="' + specialtyId + '">&times;</button>';
-                    specialtiesContainer.appendChild(newPill);
+                    specialitiesContainer.appendChild(newPill);
     
                     // Update hidden field whenever new specialty is added
-                    updateSpecialtiesHiddenField();
+                    updatespecialitiesHiddenField();
                 }
     
                 this.value = ''; // Reset dropdown after adding
             });
     
-            specialtiesContainer.addEventListener('click', function(event) {
+            specialitiesContainer.addEventListener('click', function(event) {
                 if (event.target.classList.contains('remove-specialty-btn')) {
                     const specialtyPill = event.target.closest('.specialty-pill');
                     specialtyPill.remove();
                     
                     // Update hidden field whenever a specialty is removed
-                    updateSpecialtiesHiddenField();
+                    updatespecialitiesHiddenField();
                 }
             });
     
-            // Initial call to update hidden field if there are pre-existing specialties
-            updateSpecialtiesHiddenField();
+            // Initial call to update hidden field if there are pre-existing specialities
+            updatespecialitiesHiddenField();
         });
     </script>    
 </body>

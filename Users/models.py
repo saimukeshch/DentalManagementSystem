@@ -26,10 +26,6 @@ class CustomUser(AbstractBaseUser):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
-
-    # class Meta:
-    #     managed = False
-    #     db_table = 'staff'
     
     def __str__(self):
         return self.email

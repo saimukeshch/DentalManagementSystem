@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include  # include is important here
+from django.urls import path
 from Users import views
 from doctors import views as docViews
 from patients import views as patViews
@@ -34,17 +34,9 @@ urlpatterns = [
     path('edit_clinic/',cliViews.edit_clinic, name = 'edit_clinic'),
     path('view_clinic/<int:clinic_id>',cliViews.view_clinic, name = 'view_clinic'),
     path('add_doctor_affiliation/<int:clinic_id>',cliViews.add_doctor_affiliation, name = 'add_doctor_affiliation'),
-    path('delete_clinic/',cliViews.delete_clinic, name = 'delete_clinic'),
+    path('delete_affiliation/<int:clinic_id>/<int:id>',cliViews.delete_affiliation, name = 'delete_affiliation'),
     path('add_doctor/',docViews.add_doctor, name = 'add_doctor'),
-    # path('edit_doctor/',docViews.edit_doctor, name = 'edit_doctor'),
     path('view_doctor/<int:doctor_id>',docViews.view_doctor, name = 'view_doctor'),
     path('add_patient/',patViews.add_patient, name = 'add_patient'),
-    path('edit_patient/',patViews.edit_patient, name = 'edit_patient'),
     path('view_patient/<int:patient_id>',patViews.view_patient, name = 'view_patient'),
-    path('delete_patient/',patViews.delete_patient, name = 'delete_patient'),
-    
-    
-    
-    
-    # path('users/', include('Users.urls')),  # Link to accounts app URLs
 ]
