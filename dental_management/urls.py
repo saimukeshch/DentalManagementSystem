@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from Users import views
 from doctors import views as docViews
 from patients import views as patViews
@@ -31,12 +31,14 @@ urlpatterns = [
     path('clinics/',cliViews.clinics, name = 'clinics'),
     path('patients/',patViews.patients, name = 'patients'),
     path('add_clinic/',cliViews.add_clinic, name = 'add_clinic'),
-    path('edit_clinic/',cliViews.edit_clinic, name = 'edit_clinic'),
     path('view_clinic/<int:clinic_id>',cliViews.view_clinic, name = 'view_clinic'),
     path('add_doctor_affiliation/<int:clinic_id>',cliViews.add_doctor_affiliation, name = 'add_doctor_affiliation'),
+    path('edit_affiliation/<int:clinic_id>/<int:id>',cliViews.edit_affiliation,name = 'edit_affiliation'),
     path('delete_affiliation/<int:clinic_id>/<int:id>',cliViews.delete_affiliation, name = 'delete_affiliation'),
     path('add_doctor/',docViews.add_doctor, name = 'add_doctor'),
     path('view_doctor/<int:doctor_id>',docViews.view_doctor, name = 'view_doctor'),
     path('add_patient/',patViews.add_patient, name = 'add_patient'),
     path('view_patient/<int:patient_id>',patViews.view_patient, name = 'view_patient'),
+    path('schedule_appointment/<int:patient_id>', patViews.schedule_appointment, name='schedule_appointment'),
+    path('patients/', include('patients.urls')),
 ]

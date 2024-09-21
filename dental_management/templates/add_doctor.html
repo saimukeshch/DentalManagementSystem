@@ -5,7 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doctor Detail</title>
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
 
         body {
@@ -38,24 +39,41 @@
             color: white;
             font-size: 1.2rem;
             padding: 10px;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, box-shadow 0.3s;
             text-decoration: none;
+        }
+
+        header a:visited, 
+        header a:focus,
+        header a:active {
+            color: white;
         }
 
         header a:hover {
             background-color: #0056b3;
             border-radius: 5px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         nav ul {
             list-style: none;
             padding: 0;
+            margin-top: 15px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2rem;
+            font-weight: 500;
+            text-align: center;
+            margin: 5px 0;
         }
 
         nav ul li {
             display: inline;
             margin-right: 15px;
-        }       
+        }
+  
 
         .container {
             width: 50%;
@@ -76,8 +94,16 @@
             margin-bottom: 5px;
         }
 
-        .form-group input, .form-group select {
+        .form-group input {
             width: 95%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        .form-group select {
+            width: 98%;
             padding: 8px;
             border-radius: 5px;
             border: 1px solid #ccc;
@@ -146,16 +172,20 @@
         }
 
         .login-button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
             position: fixed;
             top: 20px;
             right: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, box-shadow 0.3s;
             text-decoration: none;
-            transition: background-color 0.3s;
+            z-index: 101; 
         }
+
 
         .login-button:hover {
             background-color: #0056b3;
@@ -181,54 +211,65 @@
     </header>
 
     <div class="container">
-        <h1>Clinic Details</h1>
-        <div class="grid-container">
-            <div class="grid-item">
-                <form method="post" action="{% url 'add_clinic'%}">
-                    {% csrf_token %}
-                    <div class="form-group" hidden>
-                        <label for="clinic_id">Clinic ID</label>
-                        <input type="text" id="clinic_id" name="clinic_id" value="{{ clinic.clinic_id }}">
-                    </div>
+        <h1>Doctor Details</h1>
 
-                    <div class="form-group">
-                        <label for="name">Clinic Name</label>
-                        <input type="text" id="name" name="name" value="{{ clinic.name }}" required>
-                    </div>
-    
-                    <div class="form-group">
-                        <label for="city">City</label>
-                        <input type="text" id="city" name="city" value="{{ clinic.city }}" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="state">State</label>
-                        <input type="text" id="state" name="state" value="{{ clinic.state }}" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="phone_number">Phone Number</label>
-                        <input type="text" id="phone_number" name="phone_number" value="{{ clinic.phone_number }}" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" value="{{ clinic.email }}" required>
-                    </div>
-    
-                    <div class="button-container">
-                        <button type="submit">Save Changes</button>
-                    </div>
-                </form>
+        <form method="post" action="{% url 'add_doctor' %}">
+            {% csrf_token %}
+            <div class="form-group" hidden>
+                <label for="doctor_id">Doctor ID</label>
+                <input type="text" id="doctor_id" name="doctor_id" value="{{ doctor.doctor_id }}">
             </div>
-        </div>
-    </div>
 
+            <div class="form-group">
+                <label for="npi">NPI</label>
+                <input type="text" id="npi" name="npi" value="{{ doctor.npi }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" value="{{ doctor.name }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="{{ doctor.email }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="text" id="phone" name="phone_number" value="{{ doctor.phone_number }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="specialities">Specialities</label>
+                <div id="specialities-container">
+                    {% for specialty in doctor.specialities.all %}
+                    <span class="specialty-pill">
+                        {{ specialty.name }}
+                        <button type="button" class="remove-specialty-btn" data-specialty-id="{{ specialty.id }}">&times;</button>
+                    </span>
+                    {% endfor %}
+                </div>
+                <select id="add-specialty-dropdown" name="specialities">
+                    <option value="">Add Specialty</option>
+                    {% for specialty in all_specialities %}
+                    <option value="{{ specialty.id }}">{{ specialty.name }}</option>
+                    {% endfor %}
+                </select>
+                <input type="hidden" id="specialities-hidden-input" name="specialities_hidden">
+            </div>
+
+            <div class="button-container">
+                <button type="submit">Save Changes</button>
+            </div>
+        </form>
+    </div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const specialitiesContainer = document.getElementById('specialities-container');
             const addSpecialtyDropdown = document.getElementById('add-specialty-dropdown');
             const specialitiesHiddenField = document.getElementById('specialities-hidden-input');
     
-            // Function to update hidden field with cleaned specialities
             function updatespecialitiesHiddenField() {
                 const specialtyPills = specialitiesContainer.querySelectorAll('.specialty-pill');
                 const specialitiesArray = Array.from(specialtyPills).map(pill => pill.textContent.replace('×', '').trim());
@@ -245,32 +286,21 @@
                     newPill.innerHTML = specialtyName + 
                     ' <button type="button" class="remove-specialty-btn" data-specialty-id="' + specialtyId + '">&times;</button>';
                     specialitiesContainer.appendChild(newPill);
-    
-                    // Update hidden field whenever new specialty is added
                     updatespecialitiesHiddenField();
                 }
     
-                this.value = ''; // Reset dropdown after adding
+                this.value = ''; 
             });
     
             specialitiesContainer.addEventListener('click', function(event) {
                 if (event.target.classList.contains('remove-specialty-btn')) {
                     const specialtyPill = event.target.closest('.specialty-pill');
-                    specialtyPill.remove();
-                    
-                    // Update hidden field whenever a specialty is removed
+                    specialtyPill.remove();     
                     updatespecialitiesHiddenField();
                 }
             });
-    
-            // Initial call to update hidden field if there are pre-existing specialities
             updatespecialitiesHiddenField();
         });
     </script>    
 </body>
 </html>
-
-
-
-
-

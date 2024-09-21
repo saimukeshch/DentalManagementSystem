@@ -33,7 +33,6 @@ class Visit(models.Model):
     def __str__(self):
         return f"Visit on {self.visit_date_time} by {self.patient.name}"
 
-
 class Appointment(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
