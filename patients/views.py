@@ -10,9 +10,10 @@ from datetime import datetime, timedelta
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 import calendar
-from django.views.decorators.http import require_POST
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+import re
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 
 def patients(request):
     all_patients = Patient.objects.all().order_by('patient_id')
@@ -40,25 +41,82 @@ def patients(request):
     
     return render(request, 'patients.html', {'patients': all_patients})
 
-
 def add_patient(request):
     if request.method == 'POST':
-        if 'patient_id' in request.POST and request.POST['patient_id'] != '':
+        errors = {}
+
+        if 'patient_id' in request.POST and request.POST['patient_id']:
             patient_id = request.POST['patient_id']
             patient = get_object_or_404(Patient, patient_id=patient_id)
-            patient.ssn = request.POST['mssn'] if '*' not in request.POST['mssn'] else request.POST['ssn']
-            
+            ssn = request.POST['mssn'] if '*' not in request.POST['mssn'] else request.POST['ssn']
         else:
             patient = Patient()
-            patient.ssn = request.POST['ssn']
-        patient.name = request.POST['name']
-        patient.address = request.POST['address']
-        patient.phone_number = request.POST['phone_number']
-        patient.date_of_birth = request.POST['date_of_birth']
-        patient.gender = request.POST['gender']
+            ssn = request.POST['ssn']
+
+        name = request.POST['name']
+        address = request.POST['address']
+        phone_number = request.POST['phone_number']
+        date_of_birth = request.POST['date_of_birth']
+        gender = request.POST['gender']
+
+        if not re.match(r'^\d{10}$', phone_number):
+            errors['phone_number'] = 'Phone number must be exactly 10 digits.'
+
+        if not re.match(r'^\d{3}-\d{2}-\d{4}$', ssn):
+            errors['ssn'] = 'SSN must be in the format XXX-XX-XXXX.'
+
+        if errors and 'patient_id' in request.POST and request.POST['patient_id'] != '':
+            visits = Appointment.objects.filter(
+                patient=patient, appointment_date_time__lt=timezone.now()
+                ).order_by('appointment_date_time')
+            appointments = Appointment.objects.filter(
+                patient=patient, appointment_date_time__gt=timezone.now()
+                ).order_by('appointment_date_time')
+            
+            specialities = Specialty.objects.all()
+            doctors = Doctor.objects.all()
+            return render(request, 'view_patient.html', {
+                'errors': errors,
+                'patient': {
+                    'patient_id':patient_id,
+                    'name': name,
+                    'address': address,
+                    'phone_number': phone_number,
+                    'date_of_birth': date_of_birth,
+                    'ssn': ssn,
+                    'masked_ssn':patient.masked_ssn,
+                    'gender': gender
+                },
+                'visits':visits,
+                'appointments':appointments,
+                'specialities':specialities,
+                'doctors':doctors
+            })
+        elif errors:
+            return render(request, 'add_patient.html', {
+                'errors': errors,
+                'patient': {
+                    'name': name,
+                    'address': address,
+                    'phone_number': phone_number,
+                    'date_of_birth': date_of_birth,
+                    'ssn': ssn,
+                    'masked_ssn':ssn,
+                    'gender': gender
+                }
+            })
+
+        patient.name = name
+        patient.address = address
+        patient.phone_number = phone_number
+        patient.date_of_birth = date_of_birth
+        patient.ssn = ssn
+        patient.gender = gender
         patient.save()
+
         return HttpResponseRedirect(reverse('patients'))
-    return render(request,'add_patient.html')
+
+    return render(request, 'add_patient.html')
 
 def view_patient(request,patient_id):
     patient = Patient.objects.get(patient_id = patient_id)

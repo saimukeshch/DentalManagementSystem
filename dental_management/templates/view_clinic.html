@@ -283,11 +283,17 @@
                     <div class="form-group">
                         <label for="phone_number">Phone Number</label>
                         <input type="text" id="phone_number" name="phone_number" value="{{ clinic.phone_number }}" required>
+                        {% if errors.phone_number %}
+                            <div class="text-danger">{{ errors.phone_number }}</div>
+                        {% endif %}
                     </div>
 
                     <div class="form-group">
                         <label for="email">Email</label>
                         <input type="email" id="email" name="email" value="{{ clinic.email }}" required>
+                        {% if errors.email %}
+                            <div class="text-danger">{{ errors.email }}</div>
+                        {% endif %}
                     </div>
 
                     <div class="button-container">

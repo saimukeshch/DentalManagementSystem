@@ -237,6 +237,9 @@
                     <div class="form-group">
                         <label for="npi">NPI</label>
                         <input type="text" id="npi" name="npi" value="{{ doctor.npi }}" required>
+                        {% if errors.npi %}
+                            <div class="text-danger">{{ errors.npi }}</div>
+                        {% endif %}
                     </div>
 
                     <div class="form-group">
@@ -247,11 +250,17 @@
                     <div class="form-group">
                         <label for="email">Email</label>
                         <input type="email" id="email" name="email" value="{{ doctor.email }}" required>
+                        {% if errors.email %}
+                            <div class="text-danger">{{ errors.email }}</div>
+                        {% endif %}
                     </div>
 
                     <div class="form-group">
                         <label for="phone_number">Phone Number</label>
                         <input type="text" id="phone_number" name="phone_number" value="{{ doctor.phone_number }}" required>
+                        {% if errors.phone_number %}
+                            <div class="text-danger">{{ errors.phone_number }}</div>
+                        {% endif %}
                     </div>
 
                     <div class="form-group">

@@ -240,6 +240,9 @@
                     <div class="form-group">
                         <label for="phone_number">Phone Number</label>
                         <input type="text" id="phone_number" name="phone_number" value="{{ patient.phone_number }}" required>
+                        {% if errors.phone_number %}
+                            <div class="text-danger">{{ errors.phone_number }}</div>
+                        {% endif %}
                     </div>
 
                     <div class="form-group">
@@ -255,6 +258,9 @@
                     <div class="form-group">
                         <label for="mssn">SSN</label>
                         <input type="text" id="mssn" name="mssn" value="{{ patient.masked_ssn }}" required>
+                        {% if errors.ssn %}
+                            <div class="text-danger">{{ errors.ssn }}</div>
+                        {% endif %}
                     </div>
 
                     <div class="form-group">
@@ -274,7 +280,7 @@
 
             <div class="grid-item">
                 <h2>Schedule an Appointment</h2>
-                <form id="appointmentForm" method="post" action="{% url 'schedule_appointment' patient.patient_id%}">
+                <form id="appointmentForm" method="post" action="{% url 'schedule_appointment' patient.patient_id %}">
                   {% csrf_token %}
                   
                   <div class="form-group">

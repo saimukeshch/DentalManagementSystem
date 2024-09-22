@@ -4,6 +4,9 @@ from django.urls import reverse
 from clinics.models import Clinic
 from django.db.models import Q
 from doctors.models import Doctor, Doctor_Clinic
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+import re
 
 def clinics(request):
     all_clinics = Clinic.objects.all().order_by('clinic_id')
@@ -17,20 +20,68 @@ def clinics(request):
 
 def add_clinic(request):
     if request.method == 'POST':
+        errors = {}
+
         if 'clinic_id' in request.POST and request.POST['clinic_id']:
             clinic_id = request.POST['clinic_id']
             clinic = get_object_or_404(Clinic, clinic_id=clinic_id)
         else:
             clinic = Clinic()
-        clinic.name = request.POST['name']
-        clinic.city = request.POST['city']
-        clinic.state = request.POST['state']
-        clinic.phone_number = request.POST['phone_number']
-        clinic.email = request.POST['email']
+
+        name = request.POST['name']
+        city = request.POST['city']
+        state = request.POST['state']
+        phone_number = request.POST['phone_number']
+        email = request.POST['email']
+
+        if not re.match(r'^\d{10}$', phone_number):
+            errors['phone_number'] = 'Phone number must be exactly 10 digits.'
+
+        try:
+            validate_email(email)
+        except ValidationError:
+            errors['email'] = 'Enter a valid email address.'
+
+        if errors and 'clinic_id' in request.POST and request.POST['clinic_id'] != '':
+            affiliated_doctors = Doctor_Clinic.objects.filter(clinic_id=clinic_id)
+            for doc in affiliated_doctors:
+                doc.name = get_object_or_404(Doctor, doctor_id=doc.doctor_id)
+            doctors = Doctor.objects.exclude(doctor_id__in=affiliated_doctors.values_list('doctor_id', flat=True))
+    
+            return render(request, 'view_clinic.html', {
+                'errors': errors,
+                'clinic': {
+                    'clinic_id':clinic_id,
+                    'name' : name,
+                    'city' : city,
+                    'state' : state,
+                    'phone_number' : phone_number,
+                    'email' : email},
+                'affiliated_doctors':affiliated_doctors,
+                'doctors':doctors
+            })
+        elif errors:
+            return render(request, 'add_clinic.html', {
+                'errors': errors,
+                'clinic': {
+                    'name': name,
+                    'city': city,
+                    'state': state,
+                    'phone_number': phone_number,
+                    'email': email
+                }
+            })
+
+        clinic.name = name
+        clinic.city = city
+        clinic.state = state
+        clinic.phone_number = phone_number
+        clinic.email = email
         clinic.save()
-        
+
         return HttpResponseRedirect(reverse('clinics'))
-    return render(request,'add_clinic.html')
+
+    return render(request, 'add_clinic.html')
 
 def view_clinic(request,clinic_id):
     clinic = get_object_or_404(Clinic, clinic_id=clinic_id)
@@ -100,8 +151,6 @@ def edit_affiliation(request, clinic_id, id):
         days = ''
         start_time = end_time = None
 
-    print(days ,start_time ,end_time)
-    
     days_of_week = []
     
     days_of_week = [
