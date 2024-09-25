@@ -1,6 +1,6 @@
-# Dental Management System
+# Bright Smile Dental Systems
 
-Welcome to the Dental Management System! This Django-based web application is designed manage clinics, doctors, patients, and appointments.
+Welcome to the Bright Smile Dental Systems! This Django-based web application is designed manage clinics, doctors, patients, and appointments.
 
 ## Getting Started
 
